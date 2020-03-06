@@ -137,11 +137,11 @@ Na tela seguinte configure a url de acesso como a da imagem, isso fará com que 
 
 Ao lado esquerdo da tela terá um ícone de soma, ali poderemos adicionar o nosso dashboard:
 
-![grafana-dash1](./images/grafana-4.png =50%x)
+![grafana-dash1](./images/grafana-4.png)
 
 Após clicar em dashboard nos será dado a opção de "New Dashboard", clique nessa opção e logo em seguida do lado direito clique em "Import Dashboard":
 
-![grafana-dash2](./images/grafana-5.png =60%x) ![grafana-dash3](./images/grafana-6.png =50%x)
+![grafana-dash2](./images/grafana-5.png) ![grafana-dash3](./images/grafana-6.png)
 
 Nesta tela veremos a opção de importar um template JSON, clique nessa opção e selecione o arquivo "wildfly_wtats.json" que foi baixado do repositório:
 
