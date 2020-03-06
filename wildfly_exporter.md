@@ -1,4 +1,4 @@
-# Sua JVM no Prometheus
+# Coletando métricas do Wildlfy
 
 O monitoramento e a visilididade do ambiente sempre foram de grande importância para avaliação de performance, prevenção de problemas e correção de falhas. Atualmente ferramentas como o Prometheus podem coletar métricas de nodes e serviços para nos auxiliar nessas questões, e o Grafana nos ajuda a ter uma visibilidade melhor dessas métricas com  a criação de dashboards e gráficos.
 
