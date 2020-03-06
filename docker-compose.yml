@@ -1,0 +1,51 @@
+version: '3.3'
+
+# networks
+networks:
+  # prometheus overlay: all prometheus containers runs in this overlay, some of them also run into the Traefik one
+  prometheus:
+    driver: overlay
+
+# volume
+volumes:
+  prometheus:
+  grafana:
+
+services:
+  # prometheus service
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus:/prometheus
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.external-url=https://prometheus.domain.test'
+    networks:
+      - prometheus
+
+  # grafana service
+  grafana:
+    image: grafana/grafana:6.3.2
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana:/var/lib/grafana
+        #  - ./configs/grafana.ini:/etc/grafana/grafana.ini
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=mysecretpassword
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SERVER_DOMAIN=grafana.4linux.com
+      - GF_SERVER_ROOT_URL=https://perf.domain.test
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,blackmirror1-statusbygroup-panel,farski-blendstat-panel
+    networks:
+      - prometheus
+
+  debug:
+    image: ubuntu
+    command: sleep 10000
+    networks:
+      - prometheus
+
