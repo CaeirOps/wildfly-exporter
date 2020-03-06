@@ -33,19 +33,11 @@ services:
       - 3000:3000
     volumes:
       - grafana:/var/lib/grafana
-        #  - ./configs/grafana.ini:/etc/grafana/grafana.ini
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=mysecretpassword
+      - GF_SECURITY_ADMIN_PASSWORD=password
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SERVER_DOMAIN=grafana.4linux.com
+      - GF_SERVER_DOMAIN=grafana.domain.com
       - GF_SERVER_ROOT_URL=https://perf.domain.test
       - GF_INSTALL_PLUGINS=grafana-piechart-panel,blackmirror1-statusbygroup-panel,farski-blendstat-panel
     networks:
       - prometheus
-
-  debug:
-    image: ubuntu
-    command: sleep 10000
-    networks:
-      - prometheus
-
