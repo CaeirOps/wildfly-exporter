@@ -133,7 +133,7 @@ Após isso sera aberto uma tela para escolher qual será a fonte de dados que al
 
 Na tela seguinte configure a url de acesso como a da imagem, isso fará com que o container do grafana se conecte através dessa URL no container do prometheus para ler os dados, salve e teste no final da página:
 
-![grafana-ds3](./images/grafana-3.png)
+![grafana-ds3](./images/grafana-3.png){ width=50% }
 
 Ao lado esquerdo da tela terá um ícone de soma, ali poderemos adicionar o nosso dashboard:
 
