@@ -48,7 +48,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
 
 * Agora precisamos adicionar os seguintes parâmetros no arquivo de configuração xml utilizado, por exemplo, no modo standalone com perfil default altere o arquivo de configuração em "JBOSS_HOME/standalone/configuration/standalone.xml", adicionando os seguintes parâmetros:
 
-  * Este parâmetro irá definir que o módulo que extraímos anteriomente seja carregado e deve estar dentro da chave 'subsystem xmlns="urn:jboss:domain:ee:4.0', provavelmente você não terá em sua configuração a chave "global-modules" então será necessário inserir como no exemplo:
+>Este parâmetro irá definir que o módulo que extraímos anteriomente seja carregado e deve estar dentro da chave 'subsystem xmlns="urn:jboss:domain:ee:4.0', provavelmente você não terá em sua configuração a chave "global-modules" então será necessário inserir como no exemplo:
 
 (linha do arquivo: 167)
 
@@ -59,7 +59,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
     </global-modules>
 ```
 
-  * Este parâmetro servirá para habilitarmos as estatísticas em nosso subsystem undertow, provavelmente você irá encontrar esses parametros todos configurados, adicione então somente o "statistics-enabled="true"" como no exemplo:
+>Este parâmetro servirá para habilitarmos as estatísticas em nosso subsystem undertow, provavelmente você irá encontrar esses parametros todos configurados, adicione então somente o "statistics-enabled="true"" como no exemplo:
 
 (linha do arquivo: 465)
 
@@ -67,8 +67,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
 <subsystem xmlns="urn:jboss:domain:undertow:7.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="true">
 ````
 
-  * Aqui é uma situação muito parecida com a anterior, este parametrôs já estarão configurados no arquivo, adicione somente
-o "statistics-enabled="true"", e caso você tenha mais de um data-source será necessário adicionar em todos eles, ou apenas nos que você deseja coletar métricas:
+>Aqui é uma situação muito parecida com a anterior, este parametrôs já estarão configurados no arquivo, adicione somente o "statistics-enabled="true"", e caso você tenha mais de um data-source será necessário adicionar em todos eles, ou apenas nos que você deseja coletar métricas:
 
 (linha do arquivo: 148)
 
