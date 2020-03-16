@@ -1,6 +1,6 @@
-# Coletando métricas do Wildlfy
+# Coletando métricas do Wildfly
 
-O monitoramento e a visilididade do ambiente sempre foram de grande importância para avaliação de performance, prevenção de problemas e correção de falhas. Atualmente ferramentas como o Prometheus podem coletar métricas de nodes e serviços para nos auxiliar nessas questões, e o Grafana nos ajuda a ter uma visibilidade melhor dessas métricas com  a criação de dashboards e gráficos.
+O monitoramento e a visibilidade do ambiente sempre foram de grande importância para avaliação de performance, prevenção de problemas e correção de falhas. Atualmente ferramentas como o Prometheus podem coletar métricas de nodes e serviços para nos auxiliar nessas questões, e o Grafana nos ajuda a ter uma visibilidade melhor dessas métricas com  a criação de dashboards e gráficos.
 
 Porém sempre foi um desafio realizar o monitoramento de uma JVM, neste post veremos como realizar a coleta de métricas de uma JVM Wildfly com Prometheus e Grafana utilizando um exporter do Prometheus.
 As novas versões de Wildfly (a partir da 15), já possuem um subsystem que geram uma página de métricas e que pode ser acessada normnalmente pelo browser, assim não se faz necessário a utilização do exporter do Prometheus. Em nosso laboratório iremos demonstrar como realizar a coleta em versões anteriores a 15, pois estas que não possuem o subsystem se tornam um desafio em poder ter uma visibilidade da JVM.
@@ -10,7 +10,7 @@ As novas versões de Wildfly (a partir da 15), já possuem um subsystem que gera
 * Utilizar um SO Linux
 * GIT (<https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)>
 * Docker e Docker Compose (<https://docs.docker.com/install/linux/docker-ce/ubuntu/> | <https://docs.docker.com/compose/install/)>
-* Wildlfy 14 ou anterior (<https://wildfly.org/downloads/)>
+* Wildfly 14 ou anterior (<https://wildfly.org/downloads/)>
 
 ---
 
@@ -28,7 +28,7 @@ git clone https://github.com/CaeirOps/wildfly-exporter.git
 
 Após o clone do repositório iremos então começar a configurar nosso Wildfly para exportar as métricas que serão coletadas pelo Prometheus. O exporter que iremos utilizar é mantido pela comunidade e pode ser encontrado no repositório "<https://github.com/nlighten/wildfly_exporter".> Para iniciar a configuração iremos executar os seguintes passos:
 
-* Copie o arquivo 'wildfly_exporter_module-0.0.5.jar', que foi baixado do repositório, no diretório "$JBOSS_HOME/modules/" da sua instância do Wildlfy. - A variável $JBOSS_HOME indica o diretório do seu Wildfly, para realizar a cópia coloque o caminho relativo ou absoluto no comando da cópia, ex:
+* Copie o arquivo 'wildfly_exporter_module-0.0.5.jar', que foi baixado do repositório, no diretório "$JBOSS_HOME/modules/" da sua instância do Wildfly. - A variável $JBOSS_HOME indica o diretório do seu Wildfly, para realizar a cópia coloque o caminho relativo ou absoluto no comando da cópia, ex:
 
 ```bash
 cp wildfly-exporter/wildfly_exporter_module-0.0.5.jar /opt/wildfly/modules/
@@ -48,7 +48,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
 
 * Agora precisamos adicionar os seguintes parâmetros no arquivo de configuração xml utilizado, por exemplo, no modo standalone com perfil default altere o arquivo de configuração em "JBOSS_HOME/standalone/configuration/standalone.xml", adicionando os seguintes parâmetros:
 
->Este parâmetro irá definir que o módulo que extraímos anteriomente seja carregado e deve estar dentro da chave 'subsystem xmlns="urn:jboss:domain:ee:4.0', provavelmente você não terá em sua configuração a chave "global-modules" então será necessário inserir como no exemplo:
+>Este parâmetro irá definir que o módulo que extraímos anteriormente seja carregado e deve estar dentro da chave 'subsystem xmlns="urn:jboss:domain:ee:4.0', provavelmente você não terá em sua configuração a chave "global-modules" então será necessário inserir como no exemplo:
 
 (linha do arquivo: 167)
 
@@ -96,7 +96,7 @@ Exemplo de inicialização com o processo da JVM em listening em qualquer interf
 
 ## Prometheus + Grafana + Docker
 
-Para provisionar nossos servidores Prometheus e Grafana de forma simples e ágil, iremos utilizar contâiners Docker. Partimos do ponto que você já possua Docker e Docker Compose instalados na sua máquina. O arquivo compose que será utilizado também foi baixado do repositório anteriormente com o git clone, atente-se que a versão do compose file é 3.3 assim é necessário uma engine atualizada do Docker e do Compose. As imagens utilizadas são as oficiais do Docker Hub.
+Para provisionar nossos servidores Prometheus e Grafana de forma simples e ágil, iremos utilizar containers Docker. Partimos do ponto que você já possua Docker e Docker Compose instalados na sua máquina. O arquivo compose que será utilizado também foi baixado do repositório anteriormente com o git clone, atente-se que a versão do compose file é 3.3 assim é necessário uma engine atualizada do Docker e do Compose. As imagens utilizadas são as oficiais do Docker Hub.
 
 Para iniciarmos nossos serviços devemos serguir os passos:
 
@@ -130,7 +130,7 @@ Após isso sera aberto uma tela para escolher qual será a fonte de dados que al
 
 ![grafana-ds2](./images/grafana-2.png)
 
-Na tela seguinte configure a url de acesso como a da imagem, isso fará com que o container do grafana se conecte através dessa URL no container do prometheus para ler os dados, salve e teste no final da página:
+Na tela seguinte configure a url de acesso como a da imagem, isso fará com que o container do Grafana se conecte através dessa URL no container do prometheus para ler os dados, salve e teste no final da página:
 
 ![grafana-ds3](./images/grafana-3.png)
 
