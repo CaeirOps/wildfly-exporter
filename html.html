@@ -1,0 +1,170 @@
+<h2><span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;">Saiba o que ocorre com a sua JVM!</span></h2>
+<div class="stackedit__html">
+
+O monitoramento e a visibilidade do ambiente sempre foram de grande importância para avaliação de performance, prevenção de problemas e correção de falhas. Atualmente ferramentas como o Prometheus podem coletar métricas de máquinas e serviços para nos auxiliar nessas questões, e o Grafana nos ajuda a ter uma visibilidade melhor dessas métricas com a criação de dashboards e gráficos.
+
+Porém sempre foi um desafio realizar o monitoramento de uma JVM, neste post veremos como realizar a coleta de métricas de uma JVM Wildfly com Prometheus e Grafana utilizando um exporter do Prometheus.
+
+As novas versões de Wildfly (a partir da 15), já possuem um subsystem que gera uma página de métricas e que pode ser acessada normalmente pelo browser, assim não se faz necessário a utilização do exporter do Prometheus. Em nosso laboratório iremos demonstrar como realizar a coleta em versões anteriores a 15, pois estas que não possuem o subsystem se tornam um desafio em poder ter uma visibilidade da JVM.
+<h2 id="pré-requisitos"><em>Pré-requisitos:</em></h2>
+<ul>
+ 	<li>Utilizar um SO Linux</li>
+ 	<li>GIT (<a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)">https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)</a></li>
+ 	<li>Docker e Docker Compose (<a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/">https://docs.docker.com/install/linux/docker-ce/ubuntu/</a> | <a href="https://docs.docker.com/compose/install/)">https://docs.docker.com/compose/install/)</a></li>
+ 	<li>Wildfly 14 ou anterior (<a href="https://wildfly.org/downloads/)">https://wildfly.org/downloads/)</a></li>
+</ul>
+
+<hr />
+
+<h2 id="download-do-projeto">Download do Projeto</h2>
+Todos os arquivos necessários para a execução do nosso laboratório estão em um repositório do GitHub, assim, com o git instalado em sua máquina, escolha um diretório para ser o seu workspace e realize o clone do projeto com o seguinte comando:
+<pre class=" language-bash"><code class="prism language-bash">
+<span class="token function">git</span> clone https://github.com/CaeirOps/wildfly-exporter.git
+
+</code></pre>
+
+<hr />
+
+<h2 id="habilitando-as-métricas">Habilitando as Métricas</h2>
+Após o clone do repositório iremos então começar a configurar nosso Wildfly para exportar as métricas que serão coletadas pelo Prometheus. O exporter que iremos utilizar é mantido pela comunidade e pode ser encontrado no repositório "<a href="https://github.com/nlighten/wildfly_exporter%22.">https://github.com/nlighten/wildfly_exporter".</a> Para iniciar a configuração iremos executar os seguintes passos:
+<ul>
+ 	<li>Copie o arquivo ‘wildfly_exporter_module-0.0.5.jar’, que foi baixado do repositório, no diretório “$JBOSS_HOME/modules/” da sua instância do Wildfly. - A variável $JBOSS_HOME indica o diretório do seu Wildfly, para realizar a cópia coloque o caminho relativo ou absoluto no comando da cópia, ex:</li>
+</ul>
+<pre class=" language-bash"><code class="prism language-bash">
+<span class="token function">cp</span> wildfly-exporter/wildfly_exporter_module-0.0.5.jar /opt/wildfly/modules/
+
+</code></pre>
+<ul>
+ 	<li>Acesse o diretório “$JBOSS_HOME/modules/” e extraia o arquivo JAR com o comando:</li>
+</ul>
+<pre class=" language-bash"><code class="prism language-bash">
+jar -xvf wildfly_exporter_module-0.0.5.jar
+
+</code></pre>
+<ul>
+ 	<li>Após extrair os arquivos, vamos deletar os seguintes itens que não serão utilizados:</li>
+</ul>
+<pre class=" language-bash"><code class="prism language-bash">
+<span class="token function">rm</span> -rf META-INF <span class="token punctuation">;</span> <span class="token function">rm</span> -f wildfly_exporter_module-0.0.5.jar
+
+</code></pre>
+<ul>
+ 	<li>Agora precisamos adicionar os seguintes parâmetros no arquivo de configuração xml utilizado, por exemplo, no modo standalone com perfil default altere o arquivo de configuração em “JBOSS_HOME/standalone/configuration/standalone.xml”, adicionando os seguintes parâmetros:</li>
+</ul>
+<blockquote>Este parâmetro irá definir que o módulo que extraímos anteriormente seja carregado e deve estar dentro da chave ‘subsystem xmlns="urn:jboss:domain:ee:4.0’, provavelmente você não terá em sua configuração a chave “global-modules” então será necessário inserir como no exemplo:</blockquote>
+(linha do arquivo: 167)
+<pre class=" language-xml"><code class="prism language-xml">
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>subsystem</span>  <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>urn:jboss:domain:ee:4.0<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">    &lt;</span>global-modules</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">      &lt;</span>module</span>  <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>nl.nlighten.prometheus.wildfly<span class="token punctuation">"</span></span>  <span class="token attr-name">services</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span>  <span class="token attr-name">meta-inf</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">/&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">    &lt;/</span>global-modules</span><span class="token punctuation">&gt;</span></span>
+
+</code></pre>
+<blockquote>Este parâmetro servirá para habilitarmos as estatísticas em nosso subsystem undertow, provavelmente você irá encontrar esses parâmetros todos configurados, adicione então somente o “statistics-enabled=“true”” como no exemplo:</blockquote>
+(linha do arquivo: 465)
+<pre class=" language-xml"><code class="prism language-xml">
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>subsystem</span>  <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>urn:jboss:domain:undertow:7.0<span class="token punctuation">"</span></span>  <span class="token attr-name">default-server</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>default-server<span class="token punctuation">"</span></span>  <span class="token attr-name">default-virtual-host</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>default-host<span class="token punctuation">"</span></span>  <span class="token attr-name">default-servlet-container</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>default<span class="token punctuation">"</span></span>  <span class="token attr-name">default-security-domain</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>other<span class="token punctuation">"</span></span>  <span class="token attr-name">statistics-enabled</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+
+</code></pre>
+<blockquote>Aqui é uma situação muito parecida com a anterior, estes parâmetros já estarão configurados no arquivo, adicione somente o “statistics-enabled=“true””, e caso você tenha mais de um data-source será necessário adicionar em todos eles, ou apenas nos que você deseja coletar métricas:</blockquote>
+(linha do arquivo: 148)
+<pre class=" language-xml"><code class="prism language-xml">
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>datasource</span>  <span class="token attr-name">jndi-name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>java:jboss/datasources/ExampleDS<span class="token punctuation">"</span></span>  <span class="token attr-name">pool-name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>ExampleDS<span class="token punctuation">"</span></span>  <span class="token attr-name">enabled</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">" </span></span><span class="token attr-name">use-java-context</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span>  <span class="token attr-name">statistics-enabled</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+
+</code></pre>
+<ul>
+ 	<li>Feito isso, precisamos agora realizar o deploy de nossa aplicação que irá disponibilizar as métricas para o Prometheus. Copie o arquivo “metrics.war” do repositório para o diretório “JBOSS_HOME/standlone/deployments/”, como no exemplo:</li>
+</ul>
+<pre class=" language-bash"><code class="prism language-bash">
+<span class="token function">cp</span> wildfly-exporter/metrics.war /opt/wildfly/standalone/deployments/
+
+</code></pre>
+<ul>
+ 	<li>Realize o start da sua instância, importante lembrar que deve ser feito o bind da JVM para uma interface que possa receber conexão do Prometheus depois, pode-se utilizar a opção “-b” na inicialização para informar a interface. Após isso a página “métrics” já deve estar acessível para a visualização das métricas geradas da JVM:</li>
+</ul>
+Exemplo de inicialização com o processo da JVM em listening em qualquer interface e executando em background:
+<pre class=" language-bash"><code class="prism language-bash">
+/opt/wildfly/bin/standalone.sh -b 0.0.0.0 -c standalone.xml <span class="token operator">&gt;</span> /dev/null 2<span class="token operator">&gt;</span><span class="token operator">&amp;</span>1 <span class="token operator">&amp;</span>
+
+</code></pre>
+<img src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/metrics.png" alt="metrics" />
+
+<hr />
+
+<h2 id="prometheus--grafana--docker">Prometheus + Grafana + Docker</h2>
+Para provisionar nossos servidores Prometheus e Grafana de forma simples e ágil, iremos utilizar containers Docker. Partimos do ponto que você já possua Docker e Docker Compose instalados na sua máquina. O arquivo compose que será utilizado também foi baixado do repositório anteriormente com o git clone, atente-se que a versão do compose file é 3.3 assim é necessário uma engine atualizada do Docker e do Compose. As imagens utilizadas são as oficiais do Docker Hub.
+
+Para iniciarmos nossos serviços devemos seguir os passos:
+<ul>
+ 	<li>Dentro do diretório do repositório, edite o arquivo “./configs/prometheus.yml” adicionando os endereços IPs:Portas das instâncias como no exemplo:</li>
+</ul>
+<pre class=" language-yml"><code class="prism language-yml">
+<span class="token punctuation">-</span> <span class="token key atrule">job_name</span><span class="token punctuation">:</span> <span class="token string">'wildfly-exporter'</span>
+
+<span class="token key atrule">metrics_path</span><span class="token punctuation">:</span> /metrics
+
+<span class="token key atrule">static_configs</span><span class="token punctuation">:</span>
+
+<span class="token punctuation">-</span> <span class="token key atrule">targets</span><span class="token punctuation">:</span>
+
+<span class="token punctuation">-</span> 192.168.0.50<span class="token punctuation">:</span><span class="token number">8080</span>
+
+</code></pre>
+<ul>
+ 	<li>Executar os comandos:</li>
+</ul>
+<pre class=" language-bash"><code class="prism language-bash">
+docker swarm init <span class="token punctuation">;</span> docker-compose up -d
+
+</code></pre>
+(O PROMETHEUS USARÁ A PORTA 9090 E O GRAFANA A PORTA 3000, PODE SER ALTERADO NO ARQUIVO DO COMPOSE)
+
+Após isso já podemos acessar o nosso Prometheus e verificar na opção de “Status&gt;Targets” a conexão com a nossa JVM:
+
+<img class="" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/prometheus.png" alt="target" width="638" height="339" />
+
+Agora é a hora de acessarmos o Grafana para configurar os dashboards. O usuário e senha definidos para o Grafana estão no compose file e são respectivamente “admin/password”. Após o login na primeira tela selecione a opção “Datasource”:
+
+<img class="" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-1.png" alt="grafana-ds1" width="639" height="399" />
+
+Após isso será aberto uma tela para escolher qual será a fonte de dados que alimentará os nossos dashboards, assim podemos escolher o Prometheus:
+
+<img class="" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-2.png" alt="grafana-ds2" width="673" height="305" />
+
+Na tela seguinte configure a url de acesso como a da imagem, isso fará com que o container do Grafana se conecte através dessa URL no container do prometheus para ler os dados, salve e teste no final da página:
+
+<img class="" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-3.png" alt="grafana-ds3" width="658" height="713" />
+
+Ao lado esquerdo da tela terá um ícone de soma, ali poderemos adicionar o nosso dashboard:
+
+<img class="" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-4.png" alt="grafana-dash1" width="312" height="517" />
+
+Após clicar em dashboard nos será dado a opção de “New Dashboard”, clique nessa opção e logo em seguida do lado direito clique em “Import Dashboard”:
+
+<img class="alignleft" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-5.png" alt="grafana-dash2" width="398" height="155" />  <img class="" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-6.png" alt="grafana-dash3" width="307" height="310" />
+
+Nesta tela veremos a opção de importar um template JSON, clique nessa opção e selecione o arquivo “wildfly_stats.json” que foi baixado do repositório:
+
+<img class="" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-7.png" alt="grafana-dash4" width="638" height="357" />
+
+Ajuste as opções como a da imagem e finalize a importação:
+
+<img class="" src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-8.png" alt="grafana-dash5" width="641" height="271" />
+
+Após isso já poderemos visualizar as métricas coletadas através de gráficos no Grafana.
+
+<img src="https://raw.githubusercontent.com/CaeirOps/wildfly-exporter/master/images/grafana-9.png" alt="grafana-dash6" />
+
+<hr />
+
+Esta foi apenas uma pequena demonstração sobre o monitoramento de nossas queridas JVMs, pode ser feito muito mais e iremos explorar nos próximos posts, também como foi dito no início as novas versões de Wildfly já vem com o subsystem de métricas embarcado, não sendo necessário o deploy da app “metrics”, sinta-se à vontade para utilizar esses containers para testar também.
+
+Até a próxima!
+
+</div>
+&nbsp;
+
+&nbsp;

@@ -121,35 +121,35 @@ docker swarm init ; docker-compose up -d
 
 Após isso já podemos acessar o nosso Prometheus e verificar na opção de "Status>Targets" a conexão com a nossa JVM:
 
-![target](./images/prometheus.png)
+![target](./images/prometheus.png =638x339)
 
 Agora é a hora de acessarmos o Grafana para configurar os dashboards. O usuário e senha definidos para o Grafana estão no compose file e são respectivamente "admin/password". Após o login na primeira tela selecione a opção "Datasource":
 
-![grafana-ds1](./images/grafana-1.png)
+![grafana-ds1](./images/grafana-1.png =639x399)
 
 Após isso será aberto uma tela para escolher qual será a fonte de dados que alimentará os nossos dashboards, assim podemos escolher o Prometheus:
 
-![grafana-ds2](./images/grafana-2.png)
+![grafana-ds2](./images/grafana-2.png =673x305)
 
 Na tela seguinte configure a url de acesso como a da imagem, isso fará com que o container do Grafana se conecte através dessa URL no container do prometheus para ler os dados, salve e teste no final da página:
 
-![grafana-ds3](./images/grafana-3.png)
+![grafana-ds3](./images/grafana-3.png =658x713)
 
 Ao lado esquerdo da tela terá um ícone de soma, ali poderemos adicionar o nosso dashboard:
 
-![grafana-dash1](./images/grafana-4.png)
+![grafana-dash1](./images/grafana-4.png =312x517)
 
 Após clicar em dashboard nos será dado a opção de "New Dashboard", clique nessa opção e logo em seguida do lado direito clique em "Import Dashboard":
 
-![grafana-dash2](./images/grafana-5.png) ![grafana-dash3](./images/grafana-6.png)
+![grafana-dash2](./images/grafana-5.png =398x155) ![grafana-dash3](./images/grafana-6.png =307x310)
 
 Nesta tela veremos a opção de importar um template JSON, clique nessa opção e selecione o arquivo "wildfly_stats.json" que foi baixado do repositório:
 
-![grafana-dash4](./images/grafana-7.png)
+![grafana-dash4](./images/grafana-7.png =638x357)
 
 Ajuste as opções como a da imagem e finalize a importação:
 
-![grafana-dash5](./images/grafana-8.png)
+![grafana-dash5](./images/grafana-8.png =641x271)
 
 Após isso já poderemos visualizar as métricas coletadas através de gráficos no Grafana.
 
