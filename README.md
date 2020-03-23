@@ -1,9 +1,11 @@
 # Coletando métricas do Wildfly
 
-O monitoramento e a visibilidade do ambiente sempre foram de grande importância para avaliação de performance, prevenção de problemas e correção de falhas. Atualmente ferramentas como o Prometheus podem coletar métricas de nodes e serviços para nos auxiliar nessas questões, e o Grafana nos ajuda a ter uma visibilidade melhor dessas métricas com  a criação de dashboards e gráficos.
+## Saiba o que ocorre com a sua JVM!
+
+O monitoramento e a visibilidade do ambiente sempre foram de grande importância para avaliação de performance, prevenção de problemas e correção de falhas. Atualmente ferramentas como o Prometheus podem coletar métricas de máquinas e serviços para nos auxiliar nessas questões, e o Grafana nos ajuda a ter uma visibilidade melhor dessas métricas com  a criação de dashboards e gráficos.
 
 Porém sempre foi um desafio realizar o monitoramento de uma JVM, neste post veremos como realizar a coleta de métricas de uma JVM Wildfly com Prometheus e Grafana utilizando um exporter do Prometheus.
-As novas versões de Wildfly (a partir da 15), já possuem um subsystem que geram uma página de métricas e que pode ser acessada normnalmente pelo browser, assim não se faz necessário a utilização do exporter do Prometheus. Em nosso laboratório iremos demonstrar como realizar a coleta em versões anteriores a 15, pois estas que não possuem o subsystem se tornam um desafio em poder ter uma visibilidade da JVM.
+As novas versões de Wildfly (a partir da 15), já possuem um subsystem que gera uma página de métricas e que pode ser acessada normalmente pelo browser, assim não se faz necessário a utilização do exporter do Prometheus. Em nosso laboratório iremos demonstrar como realizar a coleta em versões anteriores a 15, pois estas que não possuem o subsystem se tornam um desafio em poder ter uma visibilidade da JVM.
 
 ## *Pré-requisitos:*
 
@@ -59,7 +61,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
     </global-modules>
 ```
 
->Este parâmetro servirá para habilitarmos as estatísticas em nosso subsystem undertow, provavelmente você irá encontrar esses parametros todos configurados, adicione então somente o "statistics-enabled="true"" como no exemplo:
+>Este parâmetro servirá para habilitarmos as estatísticas em nosso subsystem undertow, provavelmente você irá encontrar esses parâmetros todos configurados, adicione então somente o "statistics-enabled="true"" como no exemplo:
 
 (linha do arquivo: 465)
 
@@ -67,7 +69,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
 <subsystem xmlns="urn:jboss:domain:undertow:7.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="true">
 ````
 
->Aqui é uma situação muito parecida com a anterior, este parametrôs já estarão configurados no arquivo, adicione somente o "statistics-enabled="true"", e caso você tenha mais de um data-source será necessário adicionar em todos eles, ou apenas nos que você deseja coletar métricas:
+>Aqui é uma situação muito parecida com a anterior, estes parâmetros já estarão configurados no arquivo, adicione somente o "statistics-enabled="true"", e caso você tenha mais de um data-source será necessário adicionar em todos eles, ou apenas nos que você deseja coletar métricas:
 
 (linha do arquivo: 148)
 
@@ -82,7 +84,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
 cp wildfly-exporter/metrics.war /opt/wildfly/standalone/deployments/
 ```
 
-* Realize o start da sua instância, importante lembrar que o deve ser feito o bind da JVM para uma interface que possa receber conexão do Prometheus depois, pode-se utilizar a opção "-b" na inicialização para informar a interface. Após isso a página "métrics" já deve estar acessível para a visualização das métricas geradas da JVM:
+* Realize o start da sua instância, importante lembrar que deve ser feito o bind da JVM para uma interface que possa receber conexão do Prometheus depois, pode-se utilizar a opção "-b" na inicialização para informar a interface. Após isso a página "métrics" já deve estar acessível para a visualização das métricas geradas da JVM:
 
 Exemplo de inicialização com o processo da JVM em listening em qualquer interface e executando em background:
 
@@ -126,7 +128,7 @@ Agora é a hora de acessarmos o Grafana para configurar os dashboards. O usuári
 
 ![grafana-ds1](./images/grafana-1.png)
 
-Após isso sera aberto uma tela para escolher qual será a fonte de dados que alimentará os nossos dashboards, assim podemos escolher o Prometheus:
+Após isso será aberto uma tela para escolher qual será a fonte de dados que alimentará os nossos dashboards, assim podemos escolher o Prometheus:
 
 ![grafana-ds2](./images/grafana-2.png)
 
@@ -142,7 +144,7 @@ Após clicar em dashboard nos será dado a opção de "New Dashboard", clique ne
 
 ![grafana-dash2](./images/grafana-5.png) ![grafana-dash3](./images/grafana-6.png)
 
-Nesta tela veremos a opção de importar um template JSON, clique nessa opção e selecione o arquivo "wildfly_wtats.json" que foi baixado do repositório:
+Nesta tela veremos a opção de importar um template JSON, clique nessa opção e selecione o arquivo "wildfly_stats.json" que foi baixado do repositório:
 
 ![grafana-dash4](./images/grafana-7.png)
 
@@ -156,6 +158,6 @@ Após isso já poderemos visualizar as métricas coletadas através de gráficos
 
 ---
 
-Esta foi apenas uma pequena demonstração sobre o monitoramento de nossas queridas JVMs, pode ser feito muito mais e iremos explorar nos próximos posts, também como foi dito no início as novas versões de Wildfly já vem com o subsystem de métricas embarcado, não sendo necessário o deploys da app "metrics", sintase à vontade para utilizar esses containers para testar também.
+Esta foi apenas uma pequena demonstração sobre o monitoramento de nossas queridas JVMs, pode ser feito muito mais e iremos explorar nos próximos posts, também como foi dito no início as novas versões de Wildfly já vem com o subsystem de métricas embarcado, não sendo necessário o deploy da app "metrics", sinta-se à vontade para utilizar esses containers para testar também.
 
 Até a próxima!
