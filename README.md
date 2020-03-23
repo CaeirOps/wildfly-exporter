@@ -74,8 +74,7 @@ rm -rf META-INF ; rm -f wildfly_exporter_module-0.0.5.jar
 (linha do arquivo: 148)
 
 ```xml
-<datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true"
-            use-java-context="true" statistics-enabled="true">
+<datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="true">
 ````
 
 * Feito isso, precisamos agora realizar o deploy de nossa aplicação que irá disponibilizar as métricas para o Prometheus. Copie o arquivo "metrics.war" do repositório para o diretório "JBOSS_HOME/standlone/deployments/", como no exemplo:
