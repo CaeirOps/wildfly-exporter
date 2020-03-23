@@ -121,35 +121,35 @@ docker swarm init ; docker-compose up -d
 
 Após isso já podemos acessar o nosso Prometheus e verificar na opção de "Status>Targets" a conexão com a nossa JVM:
 
-<img class="" src="./images/prometheus.png" alt="target" width="638" height="339" />
+<img src="./images/prometheus.png" alt="target" width="638" height="339" />
 
 Agora é a hora de acessarmos o Grafana para configurar os dashboards. O usuário e senha definidos para o Grafana estão no compose file e são respectivamente "admin/password". Após o login na primeira tela selecione a opção "Datasource":
 
-<img class="" src="./images/grafana-1.png" alt="grafana-ds1" width="639" height="399" />
+<img src="./images/grafana-1.png" alt="grafana-ds1" width="639" height="399" />
 
 Após isso será aberto uma tela para escolher qual será a fonte de dados que alimentará os nossos dashboards, assim podemos escolher o Prometheus:
 
-<img class="" src="./images/grafana-2.png" alt="grafana-ds2" width="673" height="305" />
+<img src="./images/grafana-2.png" alt="grafana-ds2" width="673" height="305" />
 
 Na tela seguinte configure a url de acesso como a da imagem, isso fará com que o container do Grafana se conecte através dessa URL no container do prometheus para ler os dados, salve e teste no final da página:
 
-<img class="" src="./images/grafana-3.png" alt="grafana-ds3" width="658" height="713" />
+<img src="./images/grafana-3.png" alt="grafana-ds3" width="658" height="713" />
 
 Ao lado esquerdo da tela terá um ícone de soma, ali poderemos adicionar o nosso dashboard:
 
-<img class="" src="./images/grafana-4.png" alt="grafana-dash1" width="312" height="517" 
+<img src="./images/grafana-4.png" alt="grafana-dash1" width="312" height="517" 
 
 Após clicar em dashboard nos será dado a opção de "New Dashboard", clique nessa opção e logo em seguida do lado direito clique em "Import Dashboard":
 
-<img class="alignleft" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;" src="./images/grafana-5.png" alt="grafana-dash2" width="398" height="155" />  <img class="" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;" src="./images/grafana-6.png" alt="grafana-dash3" width="307" height="310" />
+<img align="left" src="./images/grafana-5.png" alt="grafana-dash2" width="398" height="155" />  <img src="./images/grafana-6.png" alt="grafana-dash3" width="307" height="310" />
 
 Nesta tela veremos a opção de importar um template JSON, clique nessa opção e selecione o arquivo "wildfly_stats.json" que foi baixado do repositório:
 
-<img class="" src="./images/grafana-7.png" alt="grafana-dash4" width="638" height="357" />
+<img src="./images/grafana-7.png" alt="grafana-dash4" width="638" height="357" />
 
 Ajuste as opções como a da imagem e finalize a importação:
 
-<img class="" src="./images/grafana-8.png" alt="grafana-dash5" width="641" height="271" />
+<img src="./images/grafana-8.png" alt="grafana-dash5" width="641" height="271" />
 
 Após isso já poderemos visualizar as métricas coletadas através de gráficos no Grafana.
 
