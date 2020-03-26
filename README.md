@@ -137,7 +137,7 @@ Na tela seguinte configure a url de acesso como a da imagem, isso fará com que 
 
 Ao lado esquerdo da tela terá um ícone de soma, ali poderemos adicionar o nosso dashboard:
 
-<img src="./images/grafana-4.png" alt="grafana-dash1" width="312" height="517" 
+<img src="./images/grafana-4.png" alt="grafana-dash1" width="312" height="517" />
 
 Após clicar em dashboard nos será dado a opção de "New Dashboard", clique nessa opção e logo em seguida do lado direito clique em "Import Dashboard":
 
